@@ -57,6 +57,9 @@ SVG_ASY_FILES := $(call filter_compiled,.svg,.asy,$(SRC_FILES))
 # PDF files which can be generated from Asymptote files. We exclude SVG_ASY_FILES because they don't contain any drawing primitives and thus won't produce a PDF.
 ASY_PDF_FILES := $(call filter_compiled,.asy,.pdf,$(filter-out $(SVG_ASY_FILES),$(SRC_FILES)))
 
+# SVG files which can be generated from Asymptote files. We exclude SVG_ASY_FILES because they don't contain any drawing primitives and thus won't produce a PDF.
+ASY_SVG_FILES := $(call filter_compiled,.asy,.svg,$(filter-out $(SVG_ASY_FILES),$(SRC_FILES)))
+
 # Makefiles which are generated while compiling to record dependencies.
 DEPENDENCY_FILES := $(patsubst %,%.d,$(SCAD_STL_FILES) $(SCAD_DXF_FILES) $(ASY_PDF_FILES))
 
@@ -70,7 +73,7 @@ ASY_DEPS := $(filter %.asy,$(SRC_FILES)) $(SVG_ASY_FILES)
 GLOBAL_DEPS := Makefile $(wildcard config.mk settings.mk)
 
 # All existing target files.
-EXISTING_TARGETS := $(filter $(SVG_DXF_FILES) $(SCAD_DXF_FILES) $(SCAD_STL_FILES) $(SVG_ASY_FILES) $(ASY_PDF_FILES) $(GENERATED_FILES) $(DEPENDENCY_FILES),$(EXISTING_FILES))
+EXISTING_TARGETS := $(filter $(SVG_DXF_FILES) $(SCAD_DXF_FILES) $(SCAD_STL_FILES) $(SVG_ASY_FILES) $(ASY_PDF_FILES) $(ASY_SVG_FILES) $(GENERATED_FILES) $(DEPENDENCY_FILES),$(EXISTING_FILES))
 
 # Goal to build Everything. Also generates files which aren't compiled to anything else. Deined here to make it the default goal.
 all: generated $(SCAD_DXF_FILES) $(SCAD_STL_FILES) $(ASY_PDF_FILES)
@@ -86,6 +89,7 @@ dxf: $(SVG_DXF_FILES) $(SCAD_DXF_FILES)
 stl: $(SCAD_STL_FILES)
 asy: $(SVG_ASY_FILES)
 pdf: $(ASY_PDF_FILES)
+svg: $(ASY_SVG_FILES)
 
 # Rule to convert an SVG file to a DXF file.
 $(SVG_DXF_FILES): %.dxf: %.svg $(GLOBAL_DEPS)
@@ -110,6 +114,11 @@ $(SCAD_STL_FILES): %.stl: %.scad $(GLOBAL_DEPS) | $(SCAD_ORDER_DEPS)
 # Rule to compile an Asymptote file to a PDF file.
 $(ASY_PDF_FILES): %.pdf: %.asy $(GLOBAL_DEPS) | $(ASY_DEPS)
 	echo [asymptote] $@
+	$(ASYMPTOTE_CMD) $< $@
+
+# Rule to compile an Asymptote file to a PDF file.
+$(ASY_SVG_FILES): %.svg: %.asy $(GLOBAL_DEPS) | $(ASY_DEPS)
+	echo [asymptote SVG] $@
 	$(ASYMPTOTE_CMD) $< $@
 
 # Rule for automaticaly generated OpenSCAD files.

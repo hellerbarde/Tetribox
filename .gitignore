@@ -5,3 +5,8 @@
 /src/**/*.stl
 /src/**/*.pdf
 /src/**/*.d
+/venv/
+/svg/
+/src/*.svg
+*.pyc
+.DS_Store

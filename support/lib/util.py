@@ -19,7 +19,6 @@ def main(fn):
     called when the containing module is run as a script (e.g. via python -m
     <module>).
     """
-    frame = inspect.currentframe().f_back
     
     def wrapped_fn(*args, **kwargs):
         try:
@@ -29,9 +28,6 @@ def main(fn):
             sys.exit(1)
         except KeyboardInterrupt:
             sys.exit(2)
-    
-    if frame.f_globals['__name__'] == '__main__':
-        wrapped_fn(*sys.argv[1:])
     
     # Allow the main function also to be called explicitly
     return wrapped_fn

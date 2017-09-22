@@ -10,3 +10,4 @@
 /src/*.svg
 *.pyc
 .DS_Store
+generated
